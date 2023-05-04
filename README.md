@@ -2,6 +2,18 @@
 
 TradingView Studies created by TealStreet.io community
 
+## Running a dev version of TealStreet's TradingView
+
+You need to have Node.JS installed (Node.JS 16+ is recommended).
+
+These commands should get you up and running the development environment on `http://localhost:3000`.
+
+```
+npm install -g yarn
+yarn
+yarn start
+```
+
 ## Adding new Indicator
 
 - Create a file in `src/customIndicators`
