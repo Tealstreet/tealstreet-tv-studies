@@ -2,6 +2,11 @@
 
 TradingView Studies created by TealStreet.io community
 
+## Adding new Indicator
+
+- Create a file in `src/customIndicators`
+- Import an indicator in `src/customIndicators/customIndicatorsGetter.ts`
+
 ## Available Scripts
 
 In the project directory, you can run:
