@@ -18,7 +18,7 @@ export function createWidgetOptions(containerId: string) {
     theme: "Dark",
     favorites: favorites,
     symbol: `AAPL`,
-    interval: "1m",
+    interval: "D",
     container: containerId,
     datafeed: new window.Datafeeds.UDFCompatibleDatafeed(
       "https://demo-feed-data.tradingview.com"
