@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { IChartingLibraryWidget } from "../../interfaces/IChartingLibraryWidget";
 import { createWidgetOptions } from "../../utils/createWidgetOptions";
 import "./TradingViewWrapperBody.css";
+import { customIndicatorsGetter } from "../../customIndicators/customIndicatorsGetter";
 
 export const TradingViewWrapperBody: React.FC<{}> = (props) => {
   const containerId = "tv";
@@ -10,9 +11,9 @@ export const TradingViewWrapperBody: React.FC<{}> = (props) => {
   useEffect(() => {
     const widgetOptions = {
       ...createWidgetOptions(containerId),
-      // ...{
-      //   custom_indicators_getter: customIndicatorsGetter,
-      // },
+      ...{
+        custom_indicators_getter: customIndicatorsGetter,
+      },
     };
 
     (tvWidget as { current: any }).current = new window.TradingView.widget(
