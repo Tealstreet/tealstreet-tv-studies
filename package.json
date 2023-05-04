@@ -1,0 +1,9 @@
+{
+  "name": "tealstreet-tv-studies",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Tealstreet/tealstreet-tv-studies.git",
+  "author": "TealStreet LLC <business@tealstreet.io>",
+  "license": "MPL-2.0",
+  "private": true
+}
