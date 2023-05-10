@@ -29,7 +29,7 @@
  * @returns PVSRA Indicator for Trading View Charting Library
  */
 
-export function SmoothedVWAP(PineJS: unknown) {
+export function SmoothedVWAP(PineJS: any) {
     return {
         name: "Smoothed VWAP",
         metainfo: {
@@ -168,7 +168,7 @@ export function SmoothedVWAP(PineJS: unknown) {
                 variable.add_hist();
             }
 
-            this.main = function (context: IContext, inputCallback) {
+            this.main = function (context, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
 

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { PineJS } from "../charting_library";
+// import { PineJS } from "../charting_library";
 
 /**
  * Port of PVSRA from Trader's Reality to PineJS
@@ -29,7 +29,7 @@ import { PineJS } from "../charting_library";
  * @returns PVSRA Indicator for Trading View Charting Library
  */
 
-export function PVSRA_Candles(PineJS: PineJS) {
+export function PVSRA_Candles(PineJS: any) {
     return {
         name: "PVSRA Candles",
         metainfo: {
