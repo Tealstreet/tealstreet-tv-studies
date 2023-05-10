@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { PineJS, IContext, IPineSeries } from "../charting_library";
+import { PineJS, IContext } from "../charting_library";
 
 /**
  * Port of PVSRA from Trader's Reality to PineJS
