@@ -95,7 +95,6 @@ export function SmoothedVWAP(PineJS: any) {
                     },
                 },
                 inputs: {
-                    // vwap_length: 60 * 24,
                     smoothing: 'ema',
                     smoothing_length: 21,
                     source: 'hlc3',
@@ -127,7 +126,7 @@ export function SmoothedVWAP(PineJS: any) {
                     id: "smoothing",
                     name: "Smoothing",
                     type: "text",
-                    defval: 'none',
+                    defval: 'ema',
                     options: [
                         'none',
                         'sma',
