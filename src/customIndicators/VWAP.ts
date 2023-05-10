@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-// import { PineJS } from "../charting_library";
+import { PineJS, IContext, IPineSeries } from "../charting_library";
 
 /**
  * Port of PVSRA from Trader's Reality to PineJS
@@ -29,7 +29,7 @@
  * @returns PVSRA Indicator for Trading View Charting Library
  */
 
-export function SmoothedVWAP(PineJS) {
+export function SmoothedVWAP(PineJS: PineJS) {
     return {
         name: "Smoothed VWAP",
         metainfo: {
@@ -85,7 +85,7 @@ export function SmoothedVWAP(PineJS) {
                     },
                 },
                 inputs: {
-                    vwap_length: 60 * 24,
+                    // vwap_length: 60 * 24,
                     smoothing: 'ema',
                     smoothing_length: 21,
                     source: 'hlc3'
@@ -97,14 +97,14 @@ export function SmoothedVWAP(PineJS) {
                 }
             },
             inputs: [
-                {
-                    id: "vwap_length",
-                    name: "VWAP Bars Length",
-                    defval: 60 * 24, // 1 day
-                    type: "integer",
-                    min: 1,
-                    max: 10000,
-                },
+                // {
+                //     id: "vwap_length",
+                //     name: "VWAP Bars Length",
+                //     defval: 60 * 24, // 1 day
+                //     type: "integer",
+                //     min: 1,
+                //     max: 10000,
+                // },
                 {
                     id: "smoothing",
                     name: "Smoothing",
@@ -149,6 +149,7 @@ export function SmoothedVWAP(PineJS) {
             this.init = function (context, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
+                this._isNewSession = null;
 
                 // Define the symbol to be plotted.
                 // Symbol should be a string.
@@ -163,35 +164,56 @@ export function SmoothedVWAP(PineJS) {
                 );
             };
 
-            this.main = function (context, inputCallback) {
+            this.add_hist = function (variable: any) {
+                variable.hist = null;
+                variable.add_hist();
+            }
+
+            this.main = function (context: IContext, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
 
-                const vwap_length = this._input(0);
+                // const vwap_length = this._input(0);
 
-                const smoothing = this._input(1);
-                const smoothing_length = this._input(2);
+                const smoothing = this._input(0);
+                const smoothing_length = this._input(1);
 
-                const source = this._input(3);
+                const source = this._input(2);
 
-
-
-                this._context.setMinimumAdditionalDepth(PineJS.Std.max(smoothing_length, vwap_length));
+                // this._context.setMinimumAdditionalDepth(PineJS.Std.max(smoothing_length, vwap_length));
                 this._context.select_sym(1);
 
-                // var time0 = this._context.new_var(this._context.symbol.time);
+                const time = this._context.symbol.time;
+                const numerator = this._context.new_var()
+                const denominator = this._context.new_var()
+
+                // setup new session check function
+                if (time && this._isNewSession === null) {
+                    this._isNewSession = PineJS.Std.createNewSessionCheck(this._context)
+                }
+
+                // when new session append to history
+                if (this._isNewSession(time)) {
+                    this.add_hist(numerator)
+                    this.add_hist(denominator)
+                }
+
                 const volume = PineJS.Std.volume(this._context);
-                const volumeHistory = this._context.new_var(volume);
+                // const volumeHistory = this._context.new_var(volume);
                 const source_data = PineJS.Std[source](this._context);
                 const sourceHistory = this._context.new_var(source_data);
                 const smoothedSource = (PineJS.Std[smoothing])(sourceHistory, smoothing_length, this._context)
-                const cumVolume = PineJS.Std.sum(volumeHistory, vwap_length, this._context);
+                // const cumVolume = PineJS.Std.sum(volumeHistory, vwap_length, this._context);
 
-                const vwap = (volume * smoothedSource) / cumVolume
-                return [
-                    vwap
-                ];
+                // set the numerator to: previous numerator value + (volume * smoothedSource)
+                numerator.set(PineJS.Std.nz(numerator.get(1), 0) + (volume * smoothedSource))
+                // set the denominator to: previous denominator value + volume
+                // cumulative volume
+                denominator.set(PineJS.Std.nz(denominator.get(1), 0) + volume)
 
+                const vwap = numerator.get() / denominator.get(0)
+
+                return [vwap]
 
             };
         },
