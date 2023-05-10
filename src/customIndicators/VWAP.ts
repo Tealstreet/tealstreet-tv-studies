@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { PineJS, IContext } from "../charting_library";
+// import { PineJS, IContext } from "../charting_library";
 
 /**
  * Port of PVSRA from Trader's Reality to PineJS
@@ -29,7 +29,7 @@ import { PineJS, IContext } from "../charting_library";
  * @returns PVSRA Indicator for Trading View Charting Library
  */
 
-export function SmoothedVWAP(PineJS: PineJS) {
+export function SmoothedVWAP(PineJS: unknown) {
     return {
         name: "Smoothed VWAP",
         metainfo: {
