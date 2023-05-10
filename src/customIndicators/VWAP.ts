@@ -149,7 +149,6 @@ export function SmoothedVWAP(PineJS: PineJS) {
             this.init = function (context, inputCallback) {
                 this._context = context;
                 this._input = inputCallback;
-                this._isNewSession = null;
 
                 // Define the symbol to be plotted.
                 // Symbol should be a string.
@@ -187,13 +186,8 @@ export function SmoothedVWAP(PineJS: PineJS) {
                 const numerator = this._context.new_var()
                 const denominator = this._context.new_var()
 
-                // setup new session check function
-                if (time && this._isNewSession === null) {
-                    this._isNewSession = PineJS.Std.createNewSessionCheck(this._context)
-                }
-
                 // when new session append to history
-                if (this._isNewSession(time)) {
+                if (time && PineJS.Std.createNewSessionCheck(this._context)(time)) {
                     this.add_hist(numerator)
                     this.add_hist(denominator)
                 }
