@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+
 // import { PineJS, IContext } from "../charting_library";
 
 /**
@@ -47,34 +48,15 @@ export function SmoothedVWAP(PineJS: any) {
                 precision: 2,
             },
             plots: [
-                // vwap
-                { id: "vwap", type: "line", palette: "palette_0" },
-                // vwap color
-                {
-                    id: "vwapColor",
-                    type: "colorer",
-                    target: "vwap",
-                    palette: "palette_0",
-                },
+                { id: "vwap", type: "line" },
+                { id: "vwap_stdev_inner_upper", type: "line" },
+                { id: "vwap_stdev_outer_upper", type: "line" },
+                { id: "vwap_stdev_inner_lower", type: "line" },
+                { id: "vwap_stdev_outer_lower", type: "line" },
+
             ],
             defaults: {
 
-                palettes: {
-
-                    palette_0: {
-                        // palette colors
-                        // change it to the default colors that you prefer,
-                        // but note that the user can change them in the Style tab
-                        // of indicator properties
-                        colors: [
-                            {
-                                color: "#0000FF",
-                                style: 0,
-                                width: 1,
-                            }
-                        ]
-                    },
-                },
                 styles: {
                     vwap: {
                         linestyle: 0,
@@ -83,34 +65,71 @@ export function SmoothedVWAP(PineJS: any) {
                         linewidth: 1,
                         color: "#0000FF",
                     },
+                    vwap_stdev_inner_upper: {
+                        linestyle: 0,
+                        plottype: 0,
+                        visible: true,
+                        linewidth: 1,
+                        color: "#00FFFF",
+                    },
+                    vwap_stdev_outer_upper: {
+                        linestyle: 0,
+                        plottype: 0,
+                        visible: true,
+                        linewidth: 1,
+                        color: "#FF00FF",
+                    },
+                    vwap_stdev_inner_lower: {
+                        linestyle: 0,
+                        plottype: 0,
+                        visible: true,
+                        linewidth: 1,
+                        color: "#00FFFF",
+                    },
+                    vwap_stdev_outer_lower: {
+                        linestyle: 0,
+                        plottype: 0,
+                        visible: true,
+                        linewidth: 1,
+                        color: "#FF00FF",
+                    },
                 },
                 inputs: {
                     // vwap_length: 60 * 24,
                     smoothing: 'ema',
                     smoothing_length: 21,
-                    source: 'hlc3'
+                    source: 'hlc3',
+                    stdev_enable: true,
+                    inner_channel_stdev_factor: 1,
+                    outter_channel_stdev_factor: 2,
+                    stdev_length: 20
                 },
             },
             styles: {
                 vwap: {
                     title: "VWAP Color"
+                },
+                vwap_stdev_inner_upper: {
+                    title: "VWAP Standard Deviation Inner Upper Color"
+                },
+                vwap_stdev_outer_upper: {
+                    title: "VWAP Standard Deviation Outer Upper Color"
+                },
+                vwap_stdev_inner_lower: {
+                    title: "VWAP Standard Deviation Inner Lower Color"
+                },
+                vwap_stdev_outer_lower: {
+                    title: "VWAP Standard Deviation Outer Lower Color"
                 }
             },
             inputs: [
-                // {
-                //     id: "vwap_length",
-                //     name: "VWAP Bars Length",
-                //     defval: 60 * 24, // 1 day
-                //     type: "integer",
-                //     min: 1,
-                //     max: 10000,
-                // },
                 {
                     id: "smoothing",
                     name: "Smoothing",
                     type: "text",
-                    defval: 'ema',
+                    defval: 'none',
                     options: [
+                        'none',
                         'sma',
                         'rma',
                         'ema',
@@ -142,6 +161,36 @@ export function SmoothedVWAP(PineJS: any) {
                         'ohlc4'
                     ]
                 },
+                {
+                    id: 'stdev_enable',
+                    name: "Use Standard Deviation",
+                    type: "bool",
+                    defval: true
+                },
+                {
+                    id: 'inner_channel_stdev_factor',
+                    name: "Standard Deviation Inner Channel Factor",
+                    type: "float",
+                    defval: 1, //
+                    min: 0.1,
+                    max: 10000
+                },
+                {
+                    id: 'outter_channel_stdev_factor',
+                    name: "Standard Deviation Outer Channel Factor",
+                    type: "float",
+                    defval: 2, //
+                    min: 0.1,
+                    max: 10000
+                },
+                {
+                    id: 'stdev_length',
+                    name: "Standard Deviation Length",
+                    type: "integer",
+                    defval: 20, //
+                    min: 1,
+                    max: 10000
+                }
 
             ],
         },
@@ -179,35 +228,82 @@ export function SmoothedVWAP(PineJS: any) {
 
                 const source = this._input(2);
 
+                const stdev_enable = this._input(3)
+                const inner_channel_stdev_factor = this._input(4);
+                const outter_channel_stdev_factor = this._input(5);
+                const stdev_length = this._input(4)
+
                 // this._context.setMinimumAdditionalDepth(PineJS.Std.max(smoothing_length, vwap_length));
                 this._context.select_sym(1);
 
                 const time = this._context.symbol.time;
-                const numerator = this._context.new_var()
-                const denominator = this._context.new_var()
+                const vwap_numerator = this._context.new_var()
+                const vwap_denominator = this._context.new_var()
+                let std_inner_upper_numerator = null;
+                let std_outter_upper_denominator = null;
+                let std_inner_lower_numerator = null;
+                let std_outter_lower_denominator = null;
+
+                if (stdev_enable) {
+                    std_inner_upper_numerator = this._context.new_var()
+                    std_outter_upper_denominator = this._context.new_var()
+                    std_inner_lower_numerator = this._context.new_var()
+                    std_outter_lower_denominator = this._context.new_var()
+                }
 
                 // when new session append to history
                 if (time && PineJS.Std.createNewSessionCheck(this._context)(time)) {
-                    this.add_hist(numerator)
-                    this.add_hist(denominator)
+                    this.add_hist(vwap_numerator)
+                    this.add_hist(vwap_denominator)
+                    if (stdev_enable) {
+                        this.add_hist(std_inner_upper_numerator)
+                        this.add_hist(std_outter_upper_denominator)
+                        this.add_hist(std_inner_lower_numerator)
+                        this.add_hist(std_outter_lower_denominator)
+                    }
                 }
 
                 const volume = PineJS.Std.volume(this._context);
                 // const volumeHistory = this._context.new_var(volume);
                 const source_data = PineJS.Std[source](this._context);
                 const sourceHistory = this._context.new_var(source_data);
-                const smoothedSource = (PineJS.Std[smoothing])(sourceHistory, smoothing_length, this._context)
+                const smoothedSource = smoothing !== 'none' ? (PineJS.Std[smoothing])(sourceHistory, smoothing_length, this._context) : source_data;
+
                 // const cumVolume = PineJS.Std.sum(volumeHistory, vwap_length, this._context);
 
-                // set the numerator to: previous numerator value + (volume * smoothedSource)
-                numerator.set(PineJS.Std.nz(numerator.get(1), 0) + (volume * smoothedSource))
-                // set the denominator to: previous denominator value + volume
-                // cumulative volume
-                denominator.set(PineJS.Std.nz(denominator.get(1), 0) + volume)
+                vwap_numerator.set(PineJS.Std.nz(vwap_numerator.get(1), 0) + (volume * smoothedSource))
+                vwap_denominator.set(PineJS.Std.nz(vwap_denominator.get(1), 0) + volume)
+                const vwap = vwap_numerator.get(0) / vwap_denominator.get(0)
+                const vwapHistory = this._context.new_var(vwap);
 
-                const vwap = numerator.get() / denominator.get(0)
+                if (stdev_enable) {
+                    let stdev = PineJS.Std.stdev(vwapHistory, stdev_length, this._context);
 
-                return [vwap]
+                    let stdDevInnerUpper = vwap + (inner_channel_stdev_factor * stdev)
+                    let stdDevOuterUpper = vwap + (outter_channel_stdev_factor * stdev)
+
+                    let stdDevInnerLower = vwap - (inner_channel_stdev_factor * stdev)
+                    let stdDevOuterLower = vwap - (outter_channel_stdev_factor * stdev)
+
+                    std_inner_upper_numerator.set(PineJS.Std.nz(std_inner_upper_numerator.get(1), 0) + (volume * stdDevInnerUpper))
+                    std_outter_upper_denominator.set(PineJS.Std.nz(std_outter_upper_denominator.get(1), 0) + (volume * stdDevOuterUpper))
+                    std_inner_lower_numerator.set(PineJS.Std.nz(std_inner_lower_numerator.get(1), 0) + (volume * stdDevInnerLower))
+                    std_outter_lower_denominator.set(PineJS.Std.nz(std_outter_lower_denominator.get(1), 0) + (volume * stdDevOuterLower))
+                }
+
+                let vwapStdDevInnerUpper = NaN
+                let vwapStdDevOuterUpper = NaN
+                let vwapStdDevInnerLower = NaN
+                let vwapStdDevOuterLower = NaN
+
+                if (stdev_enable) {
+                    vwapStdDevInnerUpper = std_inner_upper_numerator.get(0) / vwap_denominator.get(0)
+                    vwapStdDevOuterUpper = std_outter_upper_denominator.get(0) / vwap_denominator.get(0)
+                    vwapStdDevInnerLower = std_inner_lower_numerator.get(0) / vwap_denominator.get(0)
+                    vwapStdDevOuterLower = std_outter_lower_denominator.get(0) / vwap_denominator.get(0)
+                }
+
+                return [vwap, vwapStdDevInnerUpper, vwapStdDevOuterUpper, vwapStdDevInnerLower, vwapStdDevOuterLower]
 
             };
         },
