@@ -35,7 +35,7 @@ export function PVSRA_Histogram(PineJS: any) {
         metainfo: {
             name: "PVSRA Histogram",
             _metainfoVersion: 52,
-            id: "pvsra-histogram@tv-basicstudies-1",
+            id: "pvsra-histogram-1.0.0@tv-basicstudies-1",
             description: "PVSRA Histogram",
             shortDescription: "PVSRA Histogram",
             is_hidden_study: false,

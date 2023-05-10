@@ -36,7 +36,7 @@ export function SmoothedVWAP(PineJS: any) {
         metainfo: {
             name: "Smoothed VWAP",
             _metainfoVersion: 52,
-            id: "smoothed-vwap@tv-basicstudies-1",
+            id: "smoothed-vwap-1.0.0@tv-basicstudies-1",
             description: "Smoothed VWAP",
             shortDescription: "Smoothed VWAP",
             is_hidden_study: false,

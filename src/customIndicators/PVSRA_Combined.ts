@@ -35,7 +35,7 @@ export function PVSRA_Combined(PineJS: any) {
     metainfo: {
       name: "PVSRA Combined",
       _metainfoVersion: 52,
-      id: "pvsra-combined@tv-basicstudies-1",
+      id: "pvsra-combined-1.0.0@tv-basicstudies-1",
       description: "PVSRA Combined",
       shortDescription: "PVSRA Combined",
       is_hidden_study: false,

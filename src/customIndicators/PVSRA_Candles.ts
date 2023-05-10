@@ -35,7 +35,7 @@ export function PVSRA_Candles(PineJS: any) {
         metainfo: {
             name: "PVSRA Candles",
             _metainfoVersion: 52,
-            id: "pvsra-candles@tv-basicstudies-1",
+            id: "pvsra-candles-1.0.0@tv-basicstudies-1",
             description: "PVSRA Candles",
             shortDescription: "PVSRA Candles",
             is_hidden_study: false,
