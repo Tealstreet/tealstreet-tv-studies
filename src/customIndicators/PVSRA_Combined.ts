@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+// import { PineJS } from "../charting_library";
+
 /**
  * Port of PVSRA from Trader's Reality to PineJS
  * @author Lmvdzande
@@ -27,15 +29,15 @@
  * @returns PVSRA Indicator for Trading View Charting Library
  */
 
-export function PVSRA(PineJS) {
+export function PVSRA_Combined(PineJS: any) {
   return {
-    name: "PVSRA",
+    name: "PVSRA Combined",
     metainfo: {
-      name: "PVSRA",
+      name: "PVSRA Combined",
       _metainfoVersion: 52,
-      id: "pvsra@tv-basicstudies-1",
-      description: "PVSRA",
-      shortDescription: "PVSRA",
+      id: "pvsra-combined-1.0.0@tv-basicstudies-1",
+      description: "PVSRA Combined",
+      shortDescription: "PVSRA Combined",
       is_hidden_study: false,
       is_price_study: false,
       isTVScript: false,
@@ -44,10 +46,17 @@ export function PVSRA(PineJS) {
         type: "volume",
         precision: 2,
       },
+      ohlcPlots: {
+        plot_candle: {
+          title: 'Candles',
+        },
+      },
       plots: [
-        // histogram
+        // main series bar color
         { id: "bar_colorer", type: "bar_colorer", palette: "palette_0" },
+        // histogram
         { id: "histogram", type: "line", palette: "palette_0" },
+        // histogram color
         {
           id: "hColor",
           type: "colorer",
@@ -56,7 +65,9 @@ export function PVSRA(PineJS) {
         },
       ],
       defaults: {
+
         palettes: {
+
           palette_0: {
             // palette colors
             // change it to the default colors that you prefer,
@@ -73,15 +84,7 @@ export function PVSRA(PineJS) {
               { color: "#0000FF", style: 0, width: 1 },
               { color: "#999999", style: 0, width: 1 },
               { color: "#4d4d4d", style: 0, width: 1 },
-            ],
-            valToIndex: {
-              0: 0,
-              1: 1,
-              2: 2,
-              3: 3,
-              4: 4,
-              5: 5,
-            },
+            ]
           },
         },
         styles: {
@@ -100,13 +103,21 @@ export function PVSRA(PineJS) {
       palettes: {
         palette_0: {
           colors: [
-            { name: "Red Vector Color" },
-            { name: "Green Vector Color" },
-            { name: "Violet Vector Color" },
-            { name: "Blue Vector Color" },
-            { name: "Regular Candle Up Color" },
-            { name: "Regular Candle Down Color" },
+            { name: "Red Vector Histogram Color" },
+            { name: "Green Vector Histogram Color" },
+            { name: "Violet Vector Histogram Color" },
+            { name: "Blue Vector Histogram Color" },
+            { name: "Regular Candle Up Histogram Color" },
+            { name: "Regular Candle Down Histogram Color" },
           ],
+          valToIndex: {
+            0: 0,
+            1: 1,
+            2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+          },
         },
       },
       styles: {
@@ -167,8 +178,6 @@ export function PVSRA(PineJS) {
         const volumeSpread = volume * (high - low);
 
         const volumeSeries = this._context.new_var(volume);
-        const lowSeries = this._context.new_var(low);
-        const highSeries = this._context.new_var(high);
         const volumeSpreadSeries = this._context.new_var(volumeSpread);
 
         const open = PineJS.Std.open(this._context);
@@ -188,14 +197,18 @@ export function PVSRA(PineJS) {
               ? 1
               : 0
             : volume >= 1.5 * averageVolume
-            ? close > open
-              ? 3
-              : 2
-            : close > open
-            ? 4
-            : 5;
+              ? close > open
+                ? 3
+                : 2
+              : close > open
+                ? 4
+                : 5;
 
-        return [color, PineJS.Std.abs(volumeSeries), color];
+        return [
+          color,
+          PineJS.Std.abs(volumeSeries),
+          color
+        ];
       };
     },
   };
