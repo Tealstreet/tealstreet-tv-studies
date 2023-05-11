@@ -17,11 +17,11 @@ export function createWidgetOptions(containerId: string) {
     debug: false,
     theme: "Dark",
     favorites: favorites,
-    symbol: `AAPL`,
+    symbol: `XBTUSD`,
     interval: "D",
     container: containerId,
     datafeed: new window.Datafeeds.UDFCompatibleDatafeed(
-      "https://demo-feed-data.tradingview.com"
+      "https://www.bitmex.com/api/udf/"
     ),
     library_path: libraryPath,
     locale: "en",
