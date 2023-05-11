@@ -23,10 +23,10 @@
 // import { PineJS } from "../charting_library";
 
 /**
- * Port of PVSRA from Trader's Reality to PineJS
+ * Partial port of PVSRA OHLC Candles from Trader's Reality to PineJS
  * @author Lmvdzande
  * @param PineJS
- * @returns PVSRA Indicator for Trading View Charting Library
+ * @returns PVSRA OHLC Candles Indicator for Trading View Charting Library
  */
 
 export function PVSRA_Candles(PineJS: any) {

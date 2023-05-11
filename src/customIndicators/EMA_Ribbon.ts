@@ -24,10 +24,10 @@
 // import { PineJS, IContext } from "../charting_library";
 
 /**
- * Port of PVSRA from Trader's Reality to PineJS
+ * EMA Ribbon displays 10 EMAs of different lengths in one indicator for ease of management
  * @author Lmvdzande
  * @param PineJS
- * @returns PVSRA Indicator for Trading View Charting Library
+ * @returns EMA Ribbon for Trading View Charting Library
  */
 
 export function EMA_Ribbon(PineJS: any) {
