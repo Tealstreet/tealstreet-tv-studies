@@ -23,10 +23,10 @@
 // import { PineJS } from "../charting_library";
 
 /**
- * Port of PVSRA from Trader's Reality to PineJS
+ * Partial port of PVSRA Histogram from Trader's Reality to PineJS
  * @author Lmvdzande
  * @param PineJS
- * @returns PVSRA Indicator for Trading View Charting Library
+ * @returns PVSRA Histogram Indicator for Trading View Charting Library
  */
 
 export function PVSRA_Histogram(PineJS: any) {
